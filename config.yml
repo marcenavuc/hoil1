@@ -1,0 +1,4 @@
+rules:
+  plot_graphs:
+    pca:
+      scale: True
