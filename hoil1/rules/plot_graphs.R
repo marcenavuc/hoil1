@@ -13,17 +13,17 @@ assayData <- as.matrix(expressionData)
 dim(assayData) <- dim(expressionData)
 data <- ExpressionSet(assayData=as.matrix(expressionData))
 
+# Make hist
 png(file=snakemake@output[["hist"]], width=600, height=350)
 hist(exprs(data))
 dev.off()
 
-
+# Make boxplot
 png(file=snakemake@output[["boxplot"]], width=600, height=350)
 boxplot(exprs(data))
 dev.off()
 
 # Make pca
-
 PCA_raw <- stats::prcomp(t(exprs(data)), scale. = TRUE)
 percentVar <- summary(PCA_raw)$importance[2,]
 percentVar[1:6]

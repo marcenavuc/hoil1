@@ -2,3 +2,6 @@ oligo
 limma
 logger
 illuminaio
+GEOquery
+lumi
+ggplot2
