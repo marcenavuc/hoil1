@@ -38,6 +38,16 @@ rule mix_markup:
             file = open(file_path, "w")
             file.close()
 
+# rule gsea:
+#     input:
+#         "workflow/load_data/expression_matrix.csv"
+#         "allpathways.json"
+#     output:
+#         "workflow/gsea/"
+#     script:
+#         os.path.join(SCRIPT_DIR, "gsea.R")
+
+
 rule plot_graphs:
     input:
         "workflow/load_data/expression_matrix.csv",

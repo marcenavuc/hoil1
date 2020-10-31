@@ -5,3 +5,6 @@ illuminaio
 GEOquery
 lumi
 ggplot2
+gage
+pathview
+rlist

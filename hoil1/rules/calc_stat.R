@@ -48,7 +48,3 @@ new_res <- results_HealthyVSHoil
 new_res$Probe_Id <- rownames(results_HealthyVSHoil)
 total <- merge(x = new_res, y = bgx$probes, by="Probe_Id")
 write.csv(total, snakemake@output[[1]])
-
-# print(paste(snakemake@wildcards[[1]], "Vs", snakemake@wildcards[[2]], sep=''))
-# print(snakemake@wildcards[[1]])
-# print(snakemake@wildcards[[2]])
