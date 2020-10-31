@@ -3,13 +3,13 @@ library(illuminaio)
 library(limma)
 
 log_info("Start reading files")
-bgx <- readBGX(file.path(snakemake@input[[1]]))
+bgx <- readBGX(file.path(snakemake@input[['meta']]))
 
-data.eset <- read.csv(snakemake@input[[2]])
+data.eset <- read.csv(snakemake@input[['exprs']])
 rownames(data.eset) <- data.eset$X
 data.eset$X <- NULL
 
-markup <- read.csv(snakemake@input[[3]])
+markup <- read.csv(snakemake@input[['markup']])
 markup <- as.factor(markup$x)
 
 log_info("Creating design of research")
@@ -23,7 +23,9 @@ log_info("Fitting linear model")
 fit <- limma::lmFit(v)
 
 log_info("Making contrasts matrix")
-cont.matrix <- limma::makeContrasts(HealthVsHoil=Healthy - HOIL, levels=design)
+cont.name <- paste(snakemake@wildcards[[1]], "Vs", snakemake@wildcards[[2]], sep='')
+cont.value <- paste(snakemake@wildcards[[1]], "-", snakemake@wildcards[[2]])
+cont.matrix <- limma::makeContrasts(cont.name=cont.value, levels=design)
 
 log_info("Fitting contrasts")
 fit.cont <- limma::contrasts.fit(fit, cont.matrix)
@@ -46,3 +48,7 @@ new_res <- results_HealthyVSHoil
 new_res$Probe_Id <- rownames(results_HealthyVSHoil)
 total <- merge(x = new_res, y = bgx$probes, by="Probe_Id")
 write.csv(total, snakemake@output[[1]])
+
+# print(paste(snakemake@wildcards[[1]], "Vs", snakemake@wildcards[[2]], sep=''))
+# print(snakemake@wildcards[[1]])
+# print(snakemake@wildcards[[2]])
