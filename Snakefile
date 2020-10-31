@@ -4,6 +4,7 @@ from itertools import combinations
 SCRIPT_DIR = "hoil1/rules/"
 CLASSES = ["Healthy", "HOIL", "CINCA", "MWS", "MVK"]
 all_pairs = combinations(CLASSES, 2)
+BGX_PATH = "data/GPL6947_HumanHT-12_V3_0_R1_11283641_A.bgx"
 
 configfile: "config.yml"
 workdir: "hoil1"
@@ -11,7 +12,8 @@ workdir: "hoil1"
 
 rule all:
     input: 
-        expand("workflow/calc_stat/{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),
+        expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
+        expand("workflow/calc_stat/{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # calcstat
         "workflow/calc_stat/HelthyVsHoil.csv",
         "workflow/images/hist.png",
         "workflow/images/boxplot.png",
@@ -19,7 +21,7 @@ rule all:
 
 rule calc_stat:
     input:
-        meta="data/GPL6947_HumanHT-12_V3_0_R1_11283641_A.bgx",
+        meta=BGX_PATH,
         exprs="workflow/load_data/expression_matrix.csv",
         markup="workflow/load_data/markup.csv",
         pairs="workflow/mix_markup/{pair0}Vs{pair1}"
@@ -27,6 +29,18 @@ rule calc_stat:
         "workflow/calc_stat/{pair0}Vs{pair1}.csv"
     script:
         os.path.join(SCRIPT_DIR, "calc_stat.R")
+
+rule gsea:
+    input:
+        meta=BGX_PATH,
+        exprs="workflow/load_data/expression_matrix.csv",
+        markup="workflow/load_data/markup.csv",
+        pathways="allpathways.json",
+        pairs="workflow/mix_markup/{pair0}Vs{pair1}",
+    output:
+        "workflow/gsea/{pair0}Vs{pair1}/"
+    script:
+        os.path.join(SCRIPT_DIR, "gsea.R")
 
 rule mix_markup:
     input: 
@@ -37,16 +51,6 @@ rule mix_markup:
         for file_path in output:
             file = open(file_path, "w")
             file.close()
-
-# rule gsea:
-#     input:
-#         "workflow/load_data/expression_matrix.csv"
-#         "allpathways.json"
-#     output:
-#         "workflow/gsea/"
-#     script:
-#         os.path.join(SCRIPT_DIR, "gsea.R")
-
 
 rule plot_graphs:
     input:
