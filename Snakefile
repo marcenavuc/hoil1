@@ -38,7 +38,7 @@ rule gsea:
         pathways="allpathways.json",
         pairs="workflow/mix_markup/{pair0}Vs{pair1}",
     output:
-        "workflow/gsea/{pair0}Vs{pair1}/"
+        directory("workflow/gsea/{pair0}Vs{pair1}/")
     script:
         os.path.join(SCRIPT_DIR, "gsea.R")
 

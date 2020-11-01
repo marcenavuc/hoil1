@@ -37,12 +37,14 @@ data.kegg.p <- gage(data.entrez,
 log_info("gage complited")
 
 sel <- data.kegg.p$greater[, "q.val"] < 0.05 & !is.na(data.kegg.p$greater[,"q.val"])
+names(sel) <- sapply(strsplit(names(sel), ":"), function(x) x[2])
 table(sel)
 
 
 log_info("Saving results")
 # data.entrez.d <- data.entrez[, compSamples] - data.entrez[, refSamples]
 old_dir <- getwd()
+dir.create(snakemake@output[[1]])
 setwd(snakemake@output[[1]])
 try(for (each_process in names(sel)){
     if (sel[each_process])
