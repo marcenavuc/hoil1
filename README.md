@@ -12,4 +12,4 @@ if you can't install snakemake, use snakemake instalation guide
 You can use this pipeline like simple snakemake pipeline.
 For example, you can write `snakemake --cores=1` for start this pipeline
 
-![Alt text](./controllers_brief.svg)
+![Alt text](./dag.svg)

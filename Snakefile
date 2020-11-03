@@ -3,7 +3,7 @@ from itertools import combinations
 
 SCRIPT_DIR = "hoil1/rules/"
 CLASSES = ["Healthy", "HOIL", "CINCA", "MWS", "MVK"]
-all_pairs = combinations(CLASSES, 2)
+all_pairs = list(combinations(CLASSES, 2))
 BGX_PATH = "data/GPL6947_HumanHT-12_V3_0_R1_11283641_A.bgx"
 
 configfile: "config.yml"
@@ -11,10 +11,9 @@ workdir: "hoil1"
 
 
 rule all:
-    input: 
-        expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
+    input:
         expand("workflow/calc_stat/{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # calcstat
-        "workflow/calc_stat/HelthyVsHoil.csv",
+        expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
         "workflow/images/hist.png",
         "workflow/images/boxplot.png",
         "workflow/images/pca.png",
@@ -43,10 +42,10 @@ rule gsea:
         os.path.join(SCRIPT_DIR, "gsea.R")
 
 rule mix_markup:
-    input: 
+    input:
         "workflow/load_data/markup.csv",
     output:
-        expand("workflow/mix_markup/{pair[0]}Vs{pair[1]}", pair=all_pairs)
+        "workflow/mix_markup/{pair0}Vs{pair1}",
     run:
         for file_path in output:
             file = open(file_path, "w")
@@ -65,7 +64,7 @@ rule plot_graphs:
 
 
 rule load_data:
-    output: 
+    output:
         "workflow/load_data/expression_matrix.csv",
         "workflow/load_data/markup.csv",
     script:
