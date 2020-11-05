@@ -25,8 +25,8 @@ data.entrez <- data.eset[rownames(data.eset)[idx],]
 rownames(data.entrez) <- new_table$ENTREZID[idx]
 
 log_info("Get compSamples and refSamples")
-refSamples <- grep(snakemake@wildcards[[1]], markup)
-compSamples <- grep(snakemake@wildcards[[2]], markup)
+refSamples <- as.vector(grep(snakemake@wildcards[[1]], markup))
+compSamples <- as.vector(grep(snakemake@wildcards[[2]], markup))
 
 log_info("Start gage")
 data.kegg.p <- gage(data.entrez,
@@ -42,17 +42,21 @@ table(sel)
 
 
 log_info("Saving results")
-# data.entrez.d <- data.entrez[, compSamples] - data.entrez[, refSamples]
+temp <- data.matrix(data.entrez)
+change <- rowMeans(temp[, compSamples, drop=FALSE]) - rowMeans(temp[, refSamples, drop=FALSE])
 old_dir <- getwd()
 dir.create(snakemake@output[[1]])
 setwd(snakemake@output[[1]])
 try(for (each_process in names(sel)){
     if (sel[each_process])
-        # pathview(gene.data = rowMeans(data.entrez.d),
-        #     pathway.id = each_process, 
-        #     species = "hsa")
-        pathview(gene.data = rowMeans(data.entrez),
-            pathway.id = each_process, 
-            species = "hsa")
+    {
+        pathview(gene.data = change,
+             pathway.id = each_process,
+             species = "hsa")
+
+        file.remove(paste(each_process, ".png", sep=""))
+        file.remove(paste(each_process, ".xml", sep=""))
+    }
+
 })
 setwd(old_dir)

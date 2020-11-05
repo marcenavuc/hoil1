@@ -12,11 +12,32 @@ workdir: "hoil1"
 
 rule all:
     input:
-        expand("workflow/calc_stat/{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # calcstat
         expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
+        # expand("workflow/top_genes/top{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # top_genes
+        # expand("workflow/string_db/proteins{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # string_db
         "workflow/images/hist.png",
         "workflow/images/boxplot.png",
         "workflow/images/pca.png",
+        "workflow/images/heatmap.png",
+
+rule string_db:
+    input:
+        "workflow/top_genes/top{pair0}Vs{pair1}.csv"
+    params:
+        img="workflow/string_db/protein_graph{pair0}Vs{pair1}.png"
+    output:
+        out="workflow/string_db/proteins{pair0}Vs{pair1}.csv"
+    script:
+        os.path.join(SCRIPT_DIR, "protein_graph.R")
+
+rule top_genes:
+    input:
+        "workflow/calc_stat/{pair0}Vs{pair1}.csv"
+    output:
+        volcano="workflow/top_genes/volcano{pair0}Vs{pair1}.png",
+        out="workflow/top_genes/top{pair0}Vs{pair1}.csv"
+    script:
+        os.path.join(SCRIPT_DIR, "top_genes.R")
 
 rule calc_stat:
     input:
@@ -59,6 +80,7 @@ rule plot_graphs:
         hist="workflow/images/hist.png",
         boxplot="workflow/images/boxplot.png",
         pca="workflow/images/pca.png",
+        heatmap="workflow/images/heatmap.png",
     script:
         os.path.join(SCRIPT_DIR, "plot_graphs.R")
 

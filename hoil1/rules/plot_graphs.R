@@ -1,5 +1,6 @@
 library(ggplot2)
 library(Biobase)
+library(gplots)
 
 # Load data
 expressionData <- read.csv(snakemake@input[[1]])
@@ -39,4 +40,13 @@ xlab(paste0("PC1, VarExp: ", percentVar[1])) +
 ylab(paste0("PC2, VarExp: ", percentVar[2])) +
 coord_fixed(ratio = 4)
 
+dev.off()
+
+
+# Make heatmap
+exprs.matrix <- data.matrix(expressionData)
+exprs.matrix <- exprs.matrix[c(TRUE, FALSE, FALSE, FALSE), 1:ncol(exprs.matrix)]
+colnames(exprs.matrix) <- markup
+png(file=snakemake@output[["heatmap"]], width=600, height=350)
+heatmap.2(data.matrix(exprs.matrix), scale='row', trace='none')
 dev.off()
