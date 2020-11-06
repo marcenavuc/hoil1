@@ -24,6 +24,7 @@ png(file=snakemake@output[["boxplot"]], width=600, height=350)
 boxplot(exprs(data))
 dev.off()
 
+
 # Make pca
 PCA_raw <- stats::prcomp(t(exprs(data)), scale. = TRUE)
 percentVar <- summary(PCA_raw)$importance[2,]
