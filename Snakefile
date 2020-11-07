@@ -12,13 +12,22 @@ workdir: "hoil1"
 
 rule all:
     input:
-        expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
+        # expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
         # expand("workflow/top_genes/top{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # top_genes
         # expand("workflow/string_db/proteins{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # string_db
+        expand("workflow/ora/bar{pair[0]}Vs{pair[1]}.png", pair=all_pairs),  # ora
         "workflow/images/hist.png",
         "workflow/images/boxplot.png",
         "workflow/images/pca.png",
         "workflow/images/heatmap.png",
+
+rule ora:
+    input:
+        "workflow/top_genes/top{pair0}Vs{pair1}.csv"
+    output:
+        barplot="workflow/ora/bar{pair0}Vs{pair1}.png"
+    script:
+        os.path.join(SCRIPT_DIR, "ora.R")
 
 rule string_db:
     input:
