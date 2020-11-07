@@ -13,10 +13,11 @@ workdir: "hoil1"
 rule all:
     input:
         expand("workflow/calc_stat/{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # calcstat
-        expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
-        "workflow/images/hist.png",
-        "workflow/images/boxplot.png",
-        "workflow/images/pca.png",
+        expand("workflow/topGO/{pair[0]}Vs{pair[1]}", pair=all_pairs)
+        # expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
+        # "workflow/images/hist.png",
+        # "workflow/images/boxplot.png",
+        # "workflow/images/pca.png",
 
 rule calc_stat:
     input:
@@ -29,17 +30,16 @@ rule calc_stat:
     script:
         os.path.join(SCRIPT_DIR, "calc_stat.R")
 
-rule gsea:
+rule topGO:
     input:
         meta=BGX_PATH,
-        exprs="workflow/load_data/expression_matrix.csv",
-        markup="workflow/load_data/markup.csv",
         pathways="allpathways.json",
         pairs="workflow/mix_markup/{pair0}Vs{pair1}",
+        stats="workflow/calc_stat/{pair0}Vs{pair1}.csv"
     output:
-        directory("workflow/gsea/{pair0}Vs{pair1}/")
+        "workflow/topGO/{pair0}Vs{pair1}"
     script:
-        os.path.join(SCRIPT_DIR, "gsea.R")
+        os.path.join(SCRIPT_DIR, "topGO.R")
 
 rule mix_markup:
     input:
@@ -50,18 +50,6 @@ rule mix_markup:
         for file_path in output:
             file = open(file_path, "w")
             file.close()
-
-rule plot_graphs:
-    input:
-        "workflow/load_data/expression_matrix.csv",
-        "workflow/load_data/markup.csv",
-    output:
-        hist="workflow/images/hist.png",
-        boxplot="workflow/images/boxplot.png",
-        pca="workflow/images/pca.png",
-    script:
-        os.path.join(SCRIPT_DIR, "plot_graphs.R")
-
 
 rule load_data:
     output:
