@@ -14,6 +14,7 @@ assayData <- as.matrix(expressionData)
 dim(assayData) <- dim(expressionData)
 data <- ExpressionSet(assayData=as.matrix(expressionData))
 
+
 # Make hist
 png(file=snakemake@output[["hist"]], width=600, height=350)
 hist(exprs(data))
