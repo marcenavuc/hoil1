@@ -1,4 +1,7 @@
-rules:
-  plot_graphs:
-    pca:
-      scale: True
+load_data:
+  is_normalize: False
+top_genes:
+  pCutoff: 0.05
+  FCCutoff: 0.4
+ora:
+  pCutoff: 0.05

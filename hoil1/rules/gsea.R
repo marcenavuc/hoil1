@@ -4,6 +4,7 @@ library(pathview)
 library(illuminaio)
 library(rlist)
 
+log_appender(appender_file(snakemake@log[[1]]))
 log_info("Start reading files")
 bgx <- readBGX(file.path(snakemake@input[['meta']]))
 
