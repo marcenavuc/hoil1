@@ -52,7 +52,8 @@ rule top_genes:
         "workflow/calc_stat/{pair0}Vs{pair1}.csv"
     output:
         volcano="workflow/top_genes/volcano{pair0}Vs{pair1}.png",
-        out="workflow/top_genes/top{pair0}Vs{pair1}.csv"
+        up="workflow/top_genes/up{pair0}Vs{pair1}.csv",
+        down="workflow/top_genes/down{pair0}Vs{pair1}.csv"
     log: "logs/top_genes{pair0}Vs{pair1}.txt"
     params:
         pCutoff = config['top_genes']['pCutoff'],
