@@ -50,3 +50,4 @@ venv
 .idea
 .snakemake/
 workflow/
+logs/

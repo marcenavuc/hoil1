@@ -2,6 +2,7 @@ library(logger)
 library(illuminaio)
 library(limma)
 
+log_appender(appender_file(snakemake@log[[1]]))
 log_info("Start reading files")
 bgx <- readBGX(file.path(snakemake@input[['meta']]))
 

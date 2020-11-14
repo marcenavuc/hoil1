@@ -8,3 +8,5 @@ ggplot2
 gage
 pathview
 rlist
+EnhancedVolcano
+STRINGdb
