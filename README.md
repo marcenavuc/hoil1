@@ -1,6 +1,10 @@
 # hoil1
 simple pipeline on snakemake for analysis hoil1 deficency
 
+## Requirements
+* Python 3.8
+* R 4.0.2 
+
 ## Simple Installation
 1) clone repository `git clone https://github.com/marcenavuc/hoil1`
 2) Install r packat manager `renv` by typing `install.packages("renv")` in R
