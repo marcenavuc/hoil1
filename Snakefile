@@ -43,7 +43,7 @@ rule string_db:
         img="workflow/string_db/protein_graph{somedir}_{pair0}Vs{pair1}.png"
     output:
         out="workflow/string_db/proteins_{somedir}_{pair0}Vs{pair1}.csv"
-    log: "logs/string_db_{somedir}_{pair0}Vs{pair1}"
+    log: "logs/string_db_{somedir}_{pair0}Vs{pair1}.txt"
     script:
         os.path.join(SCRIPT_DIR, "protein_graph.R")
 

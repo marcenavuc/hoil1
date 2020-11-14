@@ -1,15 +1,21 @@
 # hoil1
 simple pipeline on snakemake for analysis hoil1 deficency
 
-## Installation
-1) download repository  `git clone https://github.com/marcenavuc/hoil1`
-2) Install snakemake `pip install snakemake` or 
-if you can't install snakemake, use snakemake instalation guide
- https://snakemake.readthedocs.io/en/stable/tutorial/setup.html
-3) Install all libraries from `requirements-r.txt` by `BiocManager`
+## Simple Installation
+1) clone repository `git clone https://github.com/marcenavuc/hoil1`
+2) Install r packat manager `renv` by typing `install.packages("renv")` in R
+ console
+3) Then type in R console `renv::restore("hoil1")`
+
+### Libraries
+On Python:
+* snakemake
+
+On R:
+* all libraries described in renv.lock
 
 ## How to use
 You can use this pipeline like simple snakemake pipeline.
-For example, you can write `snakemake --cores=1` for start this pipeline
+For example, you can write `snakemake --cores=1` for start this pipeline.
 
-![Alt text](./dag.svg)
+![Here should be an image that represent our pipeline](./dag.svg)
