@@ -13,6 +13,8 @@ workdir: "hoil1"
 
 rule all:
     input:
+        expand("workflow/calc_stat/{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # calcstat
+        expand("workflow/topGO/{pair[0]}Vs{pair[1]}", pair=all_pairs)  
         expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
         expand("workflow/top_genes/top{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # top_genes
         expand("workflow/string_db/proteins_top_genes_{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # string_db
@@ -82,6 +84,17 @@ rule calc_stat:
     script:
         os.path.join(SCRIPT_DIR, "calc_stat.R")
 
+rule topGO:
+    input:
+        meta=BGX_PATH,
+        pathways="allpathways.json",
+        pairs="workflow/mix_markup/{pair0}Vs{pair1}",
+        stats="workflow/calc_stat/{pair0}Vs{pair1}.csv"
+    output:
+        "workflow/topGO/{pair0}Vs{pair1}"
+    script:
+        os.path.join(SCRIPT_DIR, "topGO.R")
+
 rule gsea:
     input:
         meta=BGX_PATH,
@@ -94,7 +107,7 @@ rule gsea:
     log: "logs/gsea_{pair0}Vs{pair1}.txt"
     script:
         os.path.join(SCRIPT_DIR, "gsea.R")
-
+        
 rule mix_markup:
     input:
         "workflow/load_data/markup.csv",
@@ -104,7 +117,7 @@ rule mix_markup:
         for file_path in output:
             file = open(file_path, "w")
             file.close()
-
+       
 rule plot_graphs:
     input:
         "workflow/load_data/expression_matrix.csv",
@@ -117,7 +130,6 @@ rule plot_graphs:
     log: "logs/plot_graphs.txt"
     script:
         os.path.join(SCRIPT_DIR, "plot_graphs.R")
-
 
 rule load_data:
     output:
