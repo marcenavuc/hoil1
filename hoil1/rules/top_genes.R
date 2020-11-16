@@ -19,7 +19,10 @@ EnhancedVolcano(df,
 dev.off()
 
 log_info("Start cut off not impact genes")
-idx <- ((abs(df$logFC) > FCCutoff) & (-log10(df$adj.P.Val) >= -log10(pCutoff)))
+idx.pval <- -log10(df$adj.P.Val) >= -log10(snakemake@params[["pCutoff"]])
+idx.up <- (df$logFC > snakemake@params[["FCcutoff"]]) & idx.pval
+idx.down <- (df$logFC < -1 * snakemake@params[["FCcutoff"]]) & idx.pval
 
 log_info("Saving results")
-write.csv(df[idx,],snakemake@output[["out"]])
+write.csv(df[idx.up,],snakemake@output[["up"]])
+write.csv(df[idx.down,],snakemake@output[["down"]])

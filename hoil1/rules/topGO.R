@@ -1,12 +1,4 @@
 library(topGO)
-library(ALL)
-library(hgu95av2.db)
-library(Rgraphviz)
-library(GEOquery)
-data(ALL)
-library(illuminaio)
-data(geneList)
-library(illuminaHumanv4.db)
 library(ggplot2)
 library(logger)
 

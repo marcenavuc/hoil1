@@ -1,38 +1,56 @@
 import os
 from itertools import combinations
 
-SCRIPT_DIR = "hoil1/rules/"
-CLASSES = ["Healthy", "HOIL", "CINCA", "MWS", "MVK"]
-CEMI_CLASSES = list(map(lambda x: f"M{x}", range(1, 7)))
-all_cemi = list(zip(CEMI_CLASSES, CEMI_CLASSES))
-all_pairs = list(combinations(CLASSES, 2))
-BGX_PATH = "data/GPL6947_HumanHT-12_V3_0_R1_11283641_A.bgx"
-
 configfile: "config.yml"
 workdir: "hoil1"
 
+def pair_labels(labels):
+    return list(map(lambda pairs: f"{pairs[0]}Vs{pairs[1]}", labels))
+
+#TODO: put this constants to config.yml
+SCRIPT_DIR = "hoil1/rules/"
+CLASSES = ["Healthy", "HOIL", "CINCA", "MWS", "MVK"]
+FC = ["up", "down"]
+BGX_PATH = "data/GPL6947_HumanHT-12_V3_0_R1_11283641_A.bgx"
+CEMI_CLASSES = list(map(lambda x: f"M{x}", range(1, 7)))
+
+
+all_cemi = pair_labels(zip(CEMI_CLASSES, CEMI_CLASSES))
+all_pairs = pair_labels(combinations(CLASSES, 2))
+
+
 rule all:
     input:
-        expand("workflow/calc_stat/{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # calcstat
-        expand("workflow/topGO/{pair[0]}Vs{pair[1]}", pair=all_pairs)  
-        expand("workflow/gsea/{pair[0]}Vs{pair[1]}/", pair=all_pairs),  # gsea
-        expand("workflow/top_genes/top{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # top_genes
-        expand("workflow/string_db/proteins_top_genes_{pair[0]}Vs{pair[1]}.csv", pair=all_pairs),  # string_db
-        expand("workflow/ora/bar_top_genes_{pair[0]}Vs{pair[1]}.png", pair=all_pairs),  # ora
-        expand("workflow/string_db/proteins_cemi_{pair[0]}Vs{pair[1]}.csv", pair=all_cemi),  # string_db cemi
-        expand("workflow/ora/bar_cemi_{pair[0]}Vs{pair[1]}.png", pair=all_cemi),  # ora cemi
-        expand("workflow/cemi/top{pair[0]}Vs{pair[1]}.csv", pair=all_cemi),  # cemi
+        expand("workflow/calc_stat/{pair}.csv", pair=all_pairs),  # calcstat
+        expand("workflow/gsea/{pair}/", pair=all_pairs),  # gsea
+        expand("workflow/top_genes/up{pair}.csv", pair=all_pairs),  # top_genes
+        expand("workflow/top_genes/down{pair}.csv", pair=all_pairs),  # top_genes
+        expand("workflow/string_db/proteins_top_genes_{logFC}{pair}.csv", pair=all_pairs, logFC=FC),  # string_db
+        expand("workflow/ora/bar_top_genes_{logFC}{pair}.png", pair=all_pairs, logFC=FC),  # ora
+        expand("workflow/topGO/top_genes_{logFC}{pair}.png", pair=all_pairs, logFC=FC), # topGO
+        expand("workflow/string_db/proteins_cemi_{pair}.csv", pair=all_cemi),  # string_db cemi
+        expand("workflow/ora/bar_cemi_{pair}.png", pair=all_cemi),  # ora cemi
+        expand("workflow/topGO/cemi_{pair}.png", pair=all_cemi), # topGO cemi
+        expand("workflow/cemi/{pair}.csv", pair=all_cemi),  # cemi
         "workflow/images/hist.png",
         "workflow/images/boxplot.png",
         "workflow/images/pca.png",
         "workflow/images/heatmap.png",
 
+rule topGO:
+    input:
+        stats="workflow/{dir}/{pair}.csv"
+    output:
+        "workflow/topGO/{dir}_{pair}.png"
+    script:
+        os.path.join(SCRIPT_DIR, "topGO.R")
+
 rule ora:
     input:
-        "workflow/{somedir}/top{pair0}Vs{pair1}.csv"
+        "workflow/{dir}/{pair}.csv"
     output:
-        barplot="workflow/ora/bar_{somedir}_{pair0}Vs{pair1}.png"
-    log: "logs/ora_{somedir}_{pair0}Vs{pair1}.txt"
+        barplot="workflow/ora/bar_{dir}_{pair}.png"
+    log: "logs/ora_{dir}_{pair}.txt"
     params:
         pCutoff = config['ora']['pCutoff'],
     script:
@@ -40,12 +58,12 @@ rule ora:
 
 rule string_db:
     input:
-        "workflow/{somedir}/top{pair0}Vs{pair1}.csv"
+        "workflow/{dir}/{pair}.csv"
     params:
-        img="workflow/string_db/protein_graph{somedir}_{pair0}Vs{pair1}.png"
+        img="workflow/string_db/protein_graph{dir}_{pair}.png"
     output:
-        out="workflow/string_db/proteins_{somedir}_{pair0}Vs{pair1}.csv"
-    log: "logs/string_db_{somedir}_{pair0}Vs{pair1}.txt"
+        out="workflow/string_db/proteins_{dir}_{pair}.csv"
+    log: "logs/string_db_{dir}_{pair}.txt"
     script:
         os.path.join(SCRIPT_DIR, "protein_graph.R")
 
@@ -68,7 +86,7 @@ rule cemi:
         meta=BGX_PATH,
         exprs="workflow/load_data/expression_matrix.csv",
     output:
-        expand("workflow/cemi/top{pair[0]}Vs{pair[1]}.csv", pair=all_cemi)
+        expand("workflow/cemi/{pair}.csv", pair=all_cemi)
     log: "logs/cemi.txt"
     script:
         os.path.join(SCRIPT_DIR, "cemi.R")
@@ -84,17 +102,6 @@ rule calc_stat:
     log: "logs/calc_stat_{pair0}Vs{pair1}.txt"
     script:
         os.path.join(SCRIPT_DIR, "calc_stat.R")
-
-rule topGO:
-    input:
-        meta=BGX_PATH,
-        pathways="allpathways.json",
-        pairs="workflow/mix_markup/{pair0}Vs{pair1}",
-        stats="workflow/calc_stat/{pair0}Vs{pair1}.csv"
-    output:
-        "workflow/topGO/{pair0}Vs{pair1}"
-    script:
-        os.path.join(SCRIPT_DIR, "topGO.R")
 
 rule gsea:
     input:
@@ -113,7 +120,7 @@ rule mix_markup:
     input:
         "workflow/load_data/markup.csv",
     output:
-        "workflow/mix_markup/{pair0}Vs{pair1}",
+        expand("workflow/mix_markup/{pair}", pair=all_pairs)
     run:
         for file_path in output:
             file = open(file_path, "w")
