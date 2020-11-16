@@ -81,6 +81,7 @@ rule top_genes:
     script:
         os.path.join(SCRIPT_DIR, "top_genes.R")
 
+
 rule cemi:
     input:
         meta=BGX_PATH,
