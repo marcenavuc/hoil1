@@ -43,10 +43,10 @@ rule all:
 
 rule kegg_graph:
     input:
-        "workflow/top_genes/{pair}.csv"
+        "workflow/{dir}/{pair}.csv"
     output:
-        heatplot="workflow/kegg_graph/heatplot_{pair}.png",
-        graph = "workflow/kegg_graph/graph_{pair}.png",
+        heatplot="workflow/kegg_graph/heatplot_{dir}_{pair}.png",
+        graph = "workflow/kegg_graph/graph_{dir}_{pair}.png",
     script:
         os.path.join(SCRIPT_DIR, "kegg_graph.R")
 
