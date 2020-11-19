@@ -27,21 +27,38 @@ rule all:
         expand("workflow/top_genes/down{pair}.csv", pair=all_pairs),  # top_genes
         expand("workflow/string_db/proteins_top_genes_{logFC}{pair}.csv", pair=all_pairs, logFC=FC),  # string_db
         expand("workflow/ora/bar_top_genes_{logFC}{pair}.png", pair=all_pairs, logFC=FC),  # ora
-        expand("workflow/topGO/top_genes_{logFC}{pair}.png", pair=all_pairs, logFC=FC), # topGO
+        expand("workflow/kegg_graph/heatplot_top_genes_{logFC}{pair}.png", pair=all_pairs, logFC=FC),  # kegg_heatplot
+        expand("workflow/kegg_graph/graph_top_genes_{logFC}{pair}.png", pair=all_pairs, logFC=FC),  # kegg_graph
+        expand("workflow/topGO/bar_top_genes_{logFC}{pair}.png", pair=all_pairs, logFC=FC), # topGO
         expand("workflow/string_db/proteins_cemi_{pair}.csv", pair=all_cemi),  # string_db cemi
         expand("workflow/ora/bar_cemi_{pair}.png", pair=all_cemi),  # ora cemi
-        expand("workflow/topGO/cemi_{pair}.png", pair=all_cemi), # topGO cemi
+        # expand("workflow/topGO/bar_cemi_{pair}.png", pair=all_cemi), # topGO cemi
         expand("workflow/cemi/{pair}.csv", pair=all_cemi),  # cemi
+        expand("workflow/kegg_graph/heatplot_cemi_{pair}.png", pair=all_cemi),  # kegg_heatplot cemi
+        expand("workflow/kegg_graph/graph_cemi_{pair}.png", pair=all_cemi),  # kegg_graph cemi
         "workflow/images/hist.png",
         "workflow/images/boxplot.png",
         "workflow/images/pca.png",
         "workflow/images/heatmap.png",
 
+rule kegg_graph:
+    input:
+        "workflow/top_genes/{pair}.csv"
+    output:
+        heatplot="workflow/kegg_graph/heatplot_{pair}.png",
+        graph = "workflow/kegg_graph/graph_{pair}.png",
+    script:
+        os.path.join(SCRIPT_DIR, "kegg_graph.R")
+
+
 rule topGO:
     input:
-        stats="workflow/{dir}/{pair}.csv"
+        "workflow/{dir}/{pair}.csv"
     output:
-        "workflow/topGO/{dir}_{pair}.png"
+        barplot="workflow/topGO/bar_{dir}_{pair}.png",
+        process="workflow/topGO/process_{dir}_{pair}.png",
+    params:
+        pCutoff = config['topgo']['pCutoff'],
     script:
         os.path.join(SCRIPT_DIR, "topGO.R")
 

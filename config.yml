@@ -5,3 +5,5 @@ top_genes:
   FCCutoff: 0.4
 ora:
   pCutoff: 0.05
+topgo:
+  pCutoff: 0.05
