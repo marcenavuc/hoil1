@@ -12,7 +12,7 @@ SCRIPT_DIR = "hoil1/rules/"
 CLASSES = ["Healthy", "HOIL", "CINCA", "MWS", "MVK"]
 FC = ["up", "down"]
 BGX_PATH = "data/GPL6947_HumanHT-12_V3_0_R1_11283641_A.bgx"
-CEMI_CLASSES = list(map(lambda x: f"M{x}", range(1, 7)))
+CEMI_CLASSES = list(map(lambda x: f"M{x}", range(1, config['cemi'])))
 
 
 all_cemi = pair_labels(zip(CEMI_CLASSES, CEMI_CLASSES))
@@ -164,5 +164,9 @@ rule load_data:
     log: "logs/load_data.txt"
     params:
         is_normalize = config["load_data"]["is_normalize"],
+        path = "rules/load_data.R"
     script:
         os.path.join(SCRIPT_DIR, "load_data.R")
+    # shell:
+    #      "Rscript rules/load_data.R"
+    #      # "R -q renv::run('{params.path}')"

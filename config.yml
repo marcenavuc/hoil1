@@ -1,9 +1,10 @@
 load_data:
-  is_normalize: False
+  is_normalize: True
 top_genes:
-  pCutoff: 0.05
-  FCCutoff: 0.4
+  pCutoff: 0.01
+  FCCutoff: 1
 ora:
-  pCutoff: 0.05
+  pCutoff: 0.01
 topgo:
-  pCutoff: 0.05
+  pCutoff: 0.01
+cemi: 15
